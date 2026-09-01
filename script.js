@@ -141,6 +141,17 @@ if(customerTrack){
   const step=()=>{const card=customerTrack.querySelector('.video-card');return card?card.getBoundingClientRect().width+16:360};
   document.querySelector('#customer-prev').addEventListener('click',()=>customerTrack.scrollBy({left:-step(),behavior:'smooth'}));
   document.querySelector('#customer-next').addEventListener('click',()=>customerTrack.scrollBy({left:step(),behavior:'smooth'}));
+  // A vertical-intent wheel gesture should always scroll the page, never the
+  // track; a horizontal-intent gesture (trackpad swipe) should scroll the
+  // track natively (letting the browser's own scroll-snap handle it, rather
+  // than reimplementing it — manual scrollLeft nudges fight scroll-snap and
+  // get reset). We only ever intervene for the vertical case.
+  customerTrack.addEventListener('wheel',e=>{
+    if(Math.abs(e.deltaX)<=Math.abs(e.deltaY)){
+      e.preventDefault();
+      window.scrollBy(0,e.deltaY);
+    }
+  },{passive:false});
 }
 
 (function(){
