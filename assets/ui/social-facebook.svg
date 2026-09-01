@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="logo-facebook" clip-path="url(#clip0_0_131)">
+<path id="facebook" fill-rule="evenodd" clip-rule="evenodd" d="M11.5556 19.8797C16.3396 19.1325 20 14.9937 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 14.9937 3.66037 19.1325 8.44445 19.8797V12.8889H5.93334L5.93333 10H8.44445V7.55556C8.44445 6.13333 9.33333 4.88889 10.2222 4.44444C11.1111 4 11.3333 4 12.4444 4H12.4444C13.5556 4 14.4 4.22222 14.4 4.22222V6.55556H13C12.7778 6.55556 11.5556 6.77778 11.5556 8.11111V10H14.3041L13.8511 12.8889H11.5556V19.8797Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_0_131">
+<rect width="20" height="20" fill="white"/>
+</clipPath>
+</defs>
+</svg>
