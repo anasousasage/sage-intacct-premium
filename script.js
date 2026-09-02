@@ -246,9 +246,17 @@ if(customerTrack){
   mark('.pricing-art',{variant:'reveal-right',delay:100});
 
   var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var revealEls=document.querySelectorAll('.reveal');
+  // .video-card sits inside a horizontally-scrolling track, so only the
+  // couple of cards visible in that scroll position ever geometrically
+  // intersect the viewport — observing each one individually meant cards
+  // further along the track stayed at opacity:0 until the user manually
+  // scrolled the carousel, making it look like there were only 2 stories.
+  // Trigger all of them together off the section instead.
+  var videoCards=Array.from(document.querySelectorAll('.video-card'));
+  var revealEls=Array.from(document.querySelectorAll('.reveal')).filter(function(el){return videoCards.indexOf(el)===-1;});
   if(reduceMotion||!('IntersectionObserver' in window)){
     revealEls.forEach(function(el){el.classList.add('is-visible');});
+    videoCards.forEach(function(el){el.classList.add('is-visible');});
     return;
   }
   var io=new IntersectionObserver(function(entries){
@@ -260,4 +268,16 @@ if(customerTrack){
     });
   },{threshold:0.15,rootMargin:'0px 0px -8% 0px'});
   revealEls.forEach(function(el){io.observe(el);});
+  var customerSection=document.querySelector('#customers');
+  if(customerSection&&videoCards.length){
+    var ioCustomers=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          videoCards.forEach(function(el){el.classList.add('is-visible');});
+          ioCustomers.unobserve(entry.target);
+        }
+      });
+    },{threshold:0.15,rootMargin:'0px 0px -8% 0px'});
+    ioCustomers.observe(customerSection);
+  }
 })();
