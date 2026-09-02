@@ -65,6 +65,8 @@ function renderIndustries(){
  const right=industriesExpanded?industriesRightData:industriesRightData.slice(0,3);
  document.querySelector('#industry-left').innerHTML=left.map(row).join('');
  document.querySelector('#industry-right').innerHTML=right.map(row).join('');
+ const mobile=document.querySelector('#industry-mobile');
+ if(mobile)mobile.innerHTML=[...left,...right].map(row).join('');
 }
 renderIndustries();
 const industriesToggle=document.querySelector('#industries-toggle');
