@@ -82,6 +82,7 @@ const faqs=[
   loadYouTubeAPI();
   function resetCard(card,state){
     card.classList.remove('yt-active','playing');
+    state.creating=false;
     if(state.player){
       try{state.player.destroy()}catch(e){}
       state.player=null;
@@ -122,9 +123,10 @@ const faqs=[
       loadYouTubeAPI().then(YT=>{
         state.player=new YT.Player(state.embed,{
           videoId:state.videoId,
+          host:'https://www.youtube-nocookie.com',
           playerVars:{autoplay:1,rel:0,modestbranding:1,playsinline:1,controls:0,disablekb:1,fs:0,iv_load_policy:3,showinfo:0},
           events:{
-            onReady:()=>{state.playerReady=true;},
+            onReady:()=>{state.playerReady=true;state.creating=false;},
             onStateChange:e=>{
               if(e.data===YT.PlayerState.PLAYING)card.classList.add('playing');
               else if(e.data===YT.PlayerState.ENDED)resetCard(card,state);
