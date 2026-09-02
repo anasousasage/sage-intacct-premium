@@ -12,8 +12,30 @@ const featureData={
 };
 function renderChallenge(k){const d=challengeData[k];document.querySelector('#challenge-title').textContent=d.title;document.querySelector('#challenge-copy').textContent=d.copy;document.querySelector('#challenge-list').innerHTML=d.items.map(x=>`<li><img src="assets/ui/check-green.svg" alt="">${x}</li>`).join('')}
 document.querySelectorAll('.challenge-tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.challenge-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderChallenge(btn.dataset.key)}));renderChallenge('month');
+(function(){
+  const mount=document.querySelector('#challenge-accordion-mobile');
+  if(!mount)return;
+  const order=['month','compliance','scale','implementation'];
+  const icons={month:'icon-point',compliance:'icon-page',scale:'icon-presentation',implementation:'icon-people-chat'};
+  mount.innerHTML=order.map((k,i)=>{
+    const d=challengeData[k];
+    const items=d.items.map(x=>`<li><img src="assets/ui/check-green.svg" alt="">${x}</li>`).join('');
+    return `<div class="challenge-acc-item ${i===0?'open':''}" data-key="${k}">
+      <button class="challenge-acc-header"><span class="iconbox iconbox-asset ${icons[k]}"></span><span>${d.title}</span><img class="challenge-acc-chevron" src="assets/ui/faq-chevron-down.svg" alt=""></button>
+      <div class="challenge-acc-body"><h3>${d.title}</h3><p>${d.copy}</p><ul>${items}</ul></div>
+    </div>`;
+  }).join('');
+  mount.querySelectorAll('.challenge-acc-header').forEach(header=>{
+    header.addEventListener('click',()=>{
+      const item=header.parentElement;
+      const wasOpen=item.classList.contains('open');
+      mount.querySelectorAll('.challenge-acc-item').forEach(i=>i.classList.remove('open'));
+      if(!wasOpen)item.classList.add('open');
+    });
+  });
+})();
 const featureVideoMap={ai:'feature-1.mp4?v=2',entity:'feature-2.mp4',ledger:'feature-3.mp4',compliance:'feature-4.mp4?v=2'};
-function renderFeature(k){const d=featureData[k];document.querySelector('#feature-title').textContent=d.title;document.querySelector('#feature-intro').textContent=d.intro;document.querySelector('#feature-points').innerHTML=d.points.map(p=>`<div class="feature-point"><h4>${p[0]}</h4><p>${p[1]}</p></div>`).join('');document.querySelector('#quote-text').textContent=d.quote;const nameParts=d.name.split(/,(.*)/s);document.querySelector('#quote-name').innerHTML=`<b>${nameParts[0]}</b>${nameParts[1]?','+nameParts[1]:''}`;document.querySelector('#quote-card').classList.toggle('align-right',k==='compliance');const video=document.querySelector('#feature-video');if(video){const next=`assets/videos/${featureVideoMap[k]}`;if(video.getAttribute('src')!==next){video.setAttribute('src',next);video.load();const play=video.play();if(play&&play.catch)play.catch(()=>{});}}}
+function renderFeature(k){const d=featureData[k];document.querySelector('#feature-title').textContent=d.title;document.querySelector('#feature-intro').textContent=d.intro;document.querySelector('#feature-points').innerHTML=d.points.map(p=>`<div class="feature-point"><h4>${p[0]}</h4><p>${p[1]}</p></div>`).join('');document.querySelector('#quote-text').textContent=d.quote;const nameParts=d.name.split(/,(.*)/s);document.querySelector('#quote-name').innerHTML=`<b>${nameParts[0]}</b>${nameParts[1]?','+nameParts[1]:''}`;document.querySelector('#quote-card').classList.toggle('align-right',k==='compliance');const video=document.querySelector('#feature-video');if(video){const next=`assets/videos/${featureVideoMap[k]}`;if(video.getAttribute('src')!==next){video.setAttribute('src',next);video.load();const play=video.play();if(play&&play.catch)play.catch(()=>{});}}if(window.__playFeaturePointsAnimation)window.__playFeaturePointsAnimation();}
 document.querySelectorAll('.feature-tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.feature-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderFeature(btn.dataset.feature)}));renderFeature('ai');
 const industriesLeftData=[
  {name:'Professional Services',photo:'assets/industry-hover/professional-services.png'},
@@ -81,8 +103,9 @@ const faqs=[
   }
   loadYouTubeAPI();
   function resetCard(card,state){
-    card.classList.remove('yt-active','playing');
+    card.classList.remove('yt-active','yt-loading','yt-ready','playing');
     state.creating=false;
+    if(state.loadTimer){clearTimeout(state.loadTimer);state.loadTimer=null;}
     if(state.player){
       try{state.player.destroy()}catch(e){}
       state.player=null;
@@ -102,22 +125,33 @@ const faqs=[
     const btn=card.querySelector('.play-btn');
     const localVideo=card.querySelector('video');
     if(!embed||!btn)return;
-    const state={videoId:embed.dataset.yt,embed:embed,localVideo:localVideo,player:null,playerReady:false,creating:false};
+    if(!btn.querySelector('.play-btn-spinner')){
+      const spinner=document.createElement('span');
+      spinner.className='play-btn-spinner';
+      btn.appendChild(spinner);
+    }
+    const state={videoId:embed.dataset.yt,embed:embed,localVideo:localVideo,player:null,playerReady:false,creating:false,loadTimer:null};
     card._ytState=state;
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.video-card').forEach(other=>{
         if(other!==card&&other._ytState&&(other.classList.contains('yt-active')))resetCard(other,other._ytState);
       });
-      if(card.classList.contains('playing')){
+      if(card.classList.contains('playing')||card.classList.contains('yt-loading')){
         resetCard(card,state);
         return;
       }
-      card.classList.add('yt-active');
+      card.classList.add('yt-active','yt-loading');
       if(state.localVideo)state.localVideo.pause();
       if(state.player&&state.playerReady){
+        card.classList.remove('yt-loading');
+        card.classList.add('yt-ready');
         state.player.playVideo();
         return;
       }
+      // Safety net: if the embed never becomes ready (blocked/slow network,
+      // embedding disabled, etc.), fall back to the poster instead of
+      // leaving the card stuck on an empty/loading video area.
+      state.loadTimer=setTimeout(()=>{resetCard(card,state);},8000);
       if(state.creating)return;
       state.creating=true;
       loadYouTubeAPI().then(YT=>{
@@ -126,7 +160,13 @@ const faqs=[
           host:'https://www.youtube-nocookie.com',
           playerVars:{autoplay:1,rel:0,modestbranding:1,playsinline:1,controls:0,disablekb:1,fs:0,iv_load_policy:3,showinfo:0},
           events:{
-            onReady:()=>{state.playerReady=true;state.creating=false;},
+            onReady:()=>{
+              state.playerReady=true;state.creating=false;
+              if(state.loadTimer){clearTimeout(state.loadTimer);state.loadTimer=null;}
+              card.classList.remove('yt-loading');
+              card.classList.add('yt-ready');
+            },
+            onError:()=>{resetCard(card,state);},
             onStateChange:e=>{
               if(e.data===YT.PlayerState.PLAYING)card.classList.add('playing');
               else if(e.data===YT.PlayerState.ENDED)resetCard(card,state);
@@ -195,6 +235,43 @@ if(customerTrack){
     },120);
   },{passive:true});
   sync();
+})();
+
+(function(){
+  // The three highlighted-outcome blocks in "Real-time visibility" get their
+  // own staggered fade/slide-up, replayed every time the feature tab
+  // changes (not just once on first scroll) so switching tabs still feels
+  // alive rather than just swapping text in place.
+  const featuresSection=document.querySelector('#features');
+  const pointsContainer=document.querySelector('#feature-points');
+  if(!featuresSection||!pointsContainer)return;
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function playPointsAnimation(){
+    const points=pointsContainer.querySelectorAll('.feature-point');
+    points.forEach((p,i)=>{
+      p.classList.add('reveal');
+      p.classList.remove('is-visible');
+      p.style.transitionDelay=(i*120)+'ms';
+    });
+    if(reduceMotion){points.forEach(p=>p.classList.add('is-visible'));return;}
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      points.forEach(p=>p.classList.add('is-visible'));
+    }));
+  }
+  window.__playFeaturePointsAnimation=playPointsAnimation;
+  if(reduceMotion||!('IntersectionObserver' in window)){
+    playPointsAnimation();
+    return;
+  }
+  const io=new IntersectionObserver((entries,obs)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        playPointsAnimation();
+        obs.unobserve(entry.target);
+      }
+    });
+  },{threshold:0.15,rootMargin:'0px 0px -8% 0px'});
+  io.observe(featuresSection);
 })();
 
 (function(){
