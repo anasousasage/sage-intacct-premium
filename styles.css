@@ -65,9 +65,9 @@ h1,h2,h3,.section-head h2,.hero h1{font-family:"Sage Headline","Sage Text",sans-
 .pill:hover{filter:brightness(1.1)}
 .pill-outline:hover{background:rgba(255,255,255,.1)}
 .challenge-tab{transition:border-color .15s ease,background .15s ease}
-.challenge-tab:not(.active):hover{border-color:rgba(255,255,255,.25)}
+.challenge-tab:not(.active):hover{border-color:rgba(255,255,255,.25);background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.5)),linear-gradient(90deg,#21133e,#102d3c)}
 .feature-tab{transition:border-color .15s ease,background .15s ease}
-.feature-tab:not(.active):hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
+.feature-tab:not(.active):hover{background:rgba(0,0,0,.5)}
 .ftm-arrow,.ctm-arrow{transition:opacity .15s ease}
 .ftm-arrow:hover,.ctm-arrow:hover{opacity:.7}
 .industries-more{transition:color .15s ease}
@@ -75,7 +75,7 @@ h1,h2,h3,.section-head h2,.hero h1{font-family:"Sage Headline","Sage Text",sans-
 .industry-cta{transition:filter .15s ease}
 .industry-cta:hover{filter:brightness(1.15)}
 .faq-q{transition:background .15s ease}
-.faq-q:hover{background:rgba(255,255,255,.05)}
+.faq-q:hover{background:rgba(0,0,0,.5)}
 .footer-region{transition:color .15s ease}
 .footer-region:hover{color:var(--green)}
 .footer-social img{transition:opacity .15s ease}
