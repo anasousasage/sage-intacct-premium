@@ -92,9 +92,9 @@ h1,h2,h3,.section-head h2,.hero h1{font-family:"Sage Headline","Sage Text",sans-
 .challenge-accordion-mobile{display:none}
 .challenge-acc-item{border-radius:8px;overflow:hidden;margin-bottom:8px}
 .challenge-acc-item:last-child{margin-bottom:0}
-.challenge-acc-header{width:100%;display:flex;align-items:center;gap:16px;padding:16px 16px 16px 24px;border:0;text-align:left;cursor:pointer;color:rgba(255,255,255,.9);font-family:"Sage Text",sans-serif;font-weight:700;font-size:16px;line-height:1.4;background-image:linear-gradient(90deg,rgba(50,33,82,.5),rgba(30,73,95,.5)),linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.08))}
+.challenge-acc-header{width:100%;display:flex;align-items:center;gap:16px;padding:16px 16px 16px 24px;border:0;text-align:left;cursor:pointer;color:rgba(255,255,255,.9);font-family:"Sage Text",sans-serif;font-weight:700;font-size:16px;line-height:1.4;background-color:#0d0a17;background-image:linear-gradient(90deg,rgba(50,33,82,.7),rgba(30,73,95,.7))}
 .challenge-acc-header span:nth-child(2){flex:1}
-.challenge-acc-item.open .challenge-acc-header{background-image:linear-gradient(90deg,rgba(50,33,82,1),rgba(30,73,95,1)),linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.08))}
+.challenge-acc-item.open .challenge-acc-header{background-image:linear-gradient(90deg,rgba(50,33,82,1),rgba(30,73,95,1))}
 .challenge-acc-chevron{width:16px;height:16px;flex:0 0 auto;transition:transform .2s ease}
 .challenge-acc-item.open .challenge-acc-chevron{transform:rotate(180deg)}
 .challenge-acc-body{display:none;padding:24px;background-image:linear-gradient(180deg,rgba(30,73,95,.7),rgba(16,50,25,.7))}
@@ -132,3 +132,15 @@ h1,h2,h3,.section-head h2,.hero h1{font-family:"Sage Headline","Sage Text",sans-
 @keyframes play-btn-spin{to{transform:rotate(360deg)}}
 .video-card.yt-ready video{display:none}
 .video-card.yt-ready .video-chip,.video-card.yt-ready .video-quote,.video-card.yt-ready .video-overlay{display:none!important}
+/* The YouTube IFrame API sets explicit width/height attributes on the
+   iframe it creates (defaulting to 640x390) which ignored our container -
+   force it to fill .yt-embed exactly like any other absolutely positioned
+   layer. */
+.yt-embed iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+@media(max-width:640px){
+/* Keep the quote a separate block below the video at all times on mobile,
+   instead of tying its visibility to play state - otherwise the video
+   card's own height collapses/expands around it and leaves a big empty
+   gap once playback starts. */
+.video-card.yt-active .video-quote,.video-card.yt-loading .video-quote,.video-card.yt-ready .video-quote{display:flex!important}
+}
