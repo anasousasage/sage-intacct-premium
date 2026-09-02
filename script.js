@@ -239,9 +239,11 @@ if(customerTrack){
 
 (function(){
   // The three highlighted-outcome blocks in "Real-time visibility" get their
-  // own staggered fade/slide-up, replayed every time the feature tab
-  // changes (not just once on first scroll) so switching tabs still feels
-  // alive rather than just swapping text in place.
+  // own staggered fade/slide-up. It replays every time the feature tab
+  // changes (so switching tabs still feels alive) and, unlike a one-shot
+  // reveal, resets and re-plays every time the block scrolls back into
+  // view - so it reads as genuine scroll-driven motion rather than a
+  // single animation you might miss the first time.
   const featuresSection=document.querySelector('#features');
   const pointsContainer=document.querySelector('#feature-points');
   if(!featuresSection||!pointsContainer)return;
@@ -249,9 +251,9 @@ if(customerTrack){
   function playPointsAnimation(){
     const points=pointsContainer.querySelectorAll('.feature-point');
     points.forEach((p,i)=>{
-      p.classList.add('reveal');
+      p.classList.add('reveal','reveal-point');
       p.classList.remove('is-visible');
-      p.style.transitionDelay=(i*120)+'ms';
+      p.style.transitionDelay=(i*150)+'ms';
     });
     if(reduceMotion){points.forEach(p=>p.classList.add('is-visible'));return;}
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -263,15 +265,19 @@ if(customerTrack){
     playPointsAnimation();
     return;
   }
-  const io=new IntersectionObserver((entries,obs)=>{
+  let lastState=null;
+  const io=new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
-      if(entry.isIntersecting){
+      if(entry.isIntersecting&&lastState!==true){
+        lastState=true;
         playPointsAnimation();
-        obs.unobserve(entry.target);
+      }else if(!entry.isIntersecting&&lastState!==false){
+        lastState=false;
+        pointsContainer.querySelectorAll('.feature-point').forEach(p=>p.classList.remove('is-visible'));
       }
     });
-  },{threshold:0.15,rootMargin:'0px 0px -8% 0px'});
-  io.observe(featuresSection);
+  },{threshold:0.2,rootMargin:'0px 0px -10% 0px'});
+  io.observe(pointsContainer);
 })();
 
 (function(){
