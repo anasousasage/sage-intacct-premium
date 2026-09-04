@@ -34,7 +34,7 @@ document.querySelectorAll('.challenge-tab').forEach(btn=>btn.addEventListener('c
     });
   });
 })();
-const featureVideoMap={ai:'feature-1.mp4?v=2',entity:'feature-2.mp4',ledger:'feature-3.mp4',compliance:'feature-4.mp4?v=2'};
+const featureVideoMap={ai:'feature-1.mp4?v=2',entity:'feature-3.mp4',ledger:'feature-2.mp4',compliance:'feature-4.mp4?v=2'};
 function renderFeature(k){const d=featureData[k];document.querySelector('#feature-title').textContent=d.title;document.querySelector('#feature-intro').textContent=d.intro;document.querySelector('#feature-points').innerHTML=d.points.map(p=>`<div class="feature-point"><h4>${p[0]}</h4><p>${p[1]}</p></div>`).join('');document.querySelector('#quote-text').textContent=d.quote;const nameParts=d.name.split(/,(.*)/s);document.querySelector('#quote-name').innerHTML=`<b>${nameParts[0]}</b>${nameParts[1]?','+nameParts[1]:''}`;document.querySelector('#quote-card').classList.toggle('align-right',k==='compliance');const video=document.querySelector('#feature-video');if(video){const next=`assets/videos/${featureVideoMap[k]}`;if(video.getAttribute('src')!==next){video.setAttribute('src',next);video.load();const play=video.play();if(play&&play.catch)play.catch(()=>{});}}if(window.__playFeaturePointsAnimation)window.__playFeaturePointsAnimation();}
 document.querySelectorAll('.feature-tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.feature-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderFeature(btn.dataset.feature)}));renderFeature('ai');
 const industriesLeftData=[
