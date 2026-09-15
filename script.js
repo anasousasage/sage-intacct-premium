@@ -135,6 +135,13 @@ const faqs=[
     const state={videoId:embed.dataset.yt,embed:embed,localVideo:localVideo,player:null,playerReady:false,creating:false,loadTimer:null};
     card._ytState=state;
     btn.addEventListener('click',()=>{
+      // Clicking sets keyboard focus on the button, which the touch-tap
+      // ":focus-within" fallback below reads as "hover" - fine for touch
+      // (no real hover to fall back to), but on a real pointer device it
+      // leaves the hover icon stuck after the click even once the mouse
+      // has moved away, until something else happens to blur it. Blur
+      // immediately on such devices so :hover alone drives the icon.
+      if(window.matchMedia('(hover: hover)').matches)btn.blur();
       document.querySelectorAll('.video-card').forEach(other=>{
         if(other!==card&&other._ytState&&(other.classList.contains('yt-active')))resetCard(other,other._ytState);
       });
