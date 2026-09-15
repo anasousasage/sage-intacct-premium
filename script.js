@@ -56,7 +56,7 @@ const industriesRightData=[
 ];
 function row(item){
  let hoverEl='';
- if(item.photo)hoverEl=`<span class="industry-hover-slot"><img class="industry-hover-photo" src="${item.photo}" alt="" aria-hidden="true"></span>`;
+ if(item.photo)hoverEl=`<span class="industry-hover-slot"><span class="industry-hover-photo"><img src="${item.photo}" alt="" aria-hidden="true"></span></span>`;
  return `<div class="industry-row ${hoverEl?'has-hover-state':''}"><span class="industry-name">${item.name}</span>${hoverEl}<a class="industry-cta" href="#pricing">Take a product tour</a></div>`;
 }
 let industriesExpanded=false;
