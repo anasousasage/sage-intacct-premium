@@ -170,9 +170,13 @@ const faqs=[
             },
             onError:()=>{resetCard(card,state);},
             onStateChange:e=>{
-              if(e.data===YT.PlayerState.PLAYING)card.classList.add('playing');
+              // BUFFERING fires routinely during normal playback (not just
+              // before the first frame) - treat it as still-playing so the
+              // pause icon doesn't flicker back to play every time the
+              // video rebuffers. Only a genuine pause clears it.
+              if(e.data===YT.PlayerState.PLAYING||e.data===YT.PlayerState.BUFFERING)card.classList.add('playing');
               else if(e.data===YT.PlayerState.ENDED)resetCard(card,state);
-              else card.classList.remove('playing');
+              else if(e.data===YT.PlayerState.PAUSED)card.classList.remove('playing');
             }
           }
         });
